@@ -1,9 +1,10 @@
 package com.example.android.tictactoe;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,18 +12,22 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button[][] btns = new Button[5][5];
+    /**
+     * Player is assigned X symbol
+     * Later play will be able to choose between X and O symbol
+     * Keep tracks of wins from both sides
+     * Calling checkForWin, playerWins and machineWins(later machine will develop own choosing) methods
+     **/
 
+    RadioButton chooseX = findViewById(R.id.choose_X);
+    private Button[][] btns = new Button[3][3];
     private boolean playerTurn = true;
-
-    private boolean gridSize = false;
     private int roundCount = 0;
-
     private int myScorePoints = 0;
-    private int pcScorePoints = 0;
-
+    private int friendScorePoints = 0;
     private TextView textViewMyScore;
-    private TextView textViewPcScore;
+    private TextView textViewFriendScore;
+    private RadioButton ChooseX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +36,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
      // Linking xml attributes with java initialization for scores
         textViewMyScore = findViewById(R.id.text_view_myscore);
-        textViewPcScore = findViewById(R.id.text_view_pcscore);
+        textViewFriendScore = findViewById(R.id.text_view_pcscore);
 
      //Linking buttons with two dimensional array i and j
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 String buttonID = "btn_" + i + j;
                 int resID = getResources().getIdentifier(buttonID, "id", getPackageName());
                 btns[i][j] = findViewById(resID);
@@ -53,17 +58,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-    /** Player is assigned X symbol
-     *  Later play will be able to choose between X and O symbol
-     *  Keep tracks of wins from both sides
-     *  Calling checkForWin, playerWins and machineWins(later machine will develop own choosing) methods**/
+
     @Override
     public void onClick(View v) {
         if (!((Button) v).getText().toString().equals("")) {
             return;
         }
-        if (playerTurn) {
+        if (chooseX.isChecked()) {
             ((Button) v).setText("X");
+            Toast.makeText(this, "Friends Turn", Toast.LENGTH_SHORT).show();
         } else {
             ((Button) v).setText("O");
         }
@@ -72,9 +75,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (checkForWin()) {
             if (playerTurn) {
-                playerWins();
+                myWins();
             } else {
-                machineWins();
+                friendWins();
             }
         } else if (roundCount == 9) {
             draw();
@@ -116,21 +119,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }
 
-        if (field[0][2].equals(field[1][1])
+        return field[0][2].equals(field[1][1])
                 && field[0][2].equals(field[2][0])
-                && !field[0][2].equals("")) {
-            return true;
-        }
+                && !field[0][2].equals("");
 
-        return false;
     }
 
     /** Tracks player scores and toast when player wins
      * Calls updatePointsText and resetBoard method
      */
-    private void playerWins() {
+    private void myWins() {
         myScorePoints++;
-        Toast.makeText(this, "Player wins!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "I win!", Toast.LENGTH_SHORT).show();
         updatePointsText();
         resetBoard();
     }
@@ -138,9 +138,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**Tracks machine scores and toast when machine wins
      * Calls updatePointsText and resetBoard method
      */
-    private void machineWins() {
-        pcScorePoints++;
-        Toast.makeText(this, "PC wins!", Toast.LENGTH_SHORT).show();
+    private void friendWins() {
+        friendScorePoints++;
+        Toast.makeText(this, "Friend wins!", Toast.LENGTH_SHORT).show();
         updatePointsText();
         resetBoard();
     }
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Updates the scores of each win
     private void updatePointsText() {
         textViewMyScore.setText("My Score: " + myScorePoints);
-        textViewPcScore.setText("PC Score: " + pcScorePoints);
+        textViewFriendScore.setText("Friend's Score: " + friendScorePoints);
     }
 
     // Restarts the game when a winner is found or when there is a draw
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Resets the scores to zero for both plays, begin game afresh
     private void reset() {
         myScorePoints = 0;
-        pcScorePoints = 0;
+        friendScorePoints = 0;
         updatePointsText();
         resetBoard();
     }
