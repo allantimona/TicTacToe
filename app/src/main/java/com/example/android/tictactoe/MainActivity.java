@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int friendScorePoints = 0;
     private TextView textViewMyScore;
     private TextView textViewFriendScore;
-    private RadioButton ChooseX;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
